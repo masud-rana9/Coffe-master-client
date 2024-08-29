@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Link, useLoaderData } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const loadedData = useLoaderData();
+  const [coffe, setCoffe] = useState(loadedData);
+
+  const handleDelete = (_id) => {
+    console.log(_id);
+    fetch(`http://localhost:3000/coffe/${_id}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.deletedCount > 0) {
+          alert("delete successfully");
+          const remaining = coffe.filter((item) => item._id != _id);
+          setCoffe(remaining);
+        }
+      });
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="">
+      <h1>Coffe Information no:{coffe.length}</h1>
+      {coffe.map((item) => (
+        <div className="flex gap-10 mt-10 p-8" key={item._id}>
+          <p>{item._id}</p>
+          <p>{item.name}</p>
+          <p>{item.quantity}</p>
+          <p>{item.supplier}</p>
+          <p>{item.taste}</p>
+          <p>{item.category}</p>
+          <p>{item.details}</p>
+          <p>{item.photo}</p>
+          <Link to={`/updatecoffe/${item._id}`}>
+            <button>edit</button>
+          </Link>
+          <button
+            onClick={() => {
+              handleDelete(item._id);
+            }}
+          >
+            X
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-export default App
+export default App;
